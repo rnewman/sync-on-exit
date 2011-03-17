@@ -82,10 +82,11 @@ SyncOnExitObserver.prototype = {
   observe: function(subject, topic, data) {
     switch (topic) {
       case "weave:service:ready":
-        this.startListening();
+        let obs = getObserverService();
+        obs.addObserver(this, "quit-application-granted", false);
         break;
       case "weave:service:logout:finish":
-        this.stopListening();
+        this.removeQuietly("quit-application-granted");
         break;
       case "quit-application-granted":
         doSync();
@@ -93,19 +94,12 @@ SyncOnExitObserver.prototype = {
     }
   },
   
-  startListening: function() {
-    let obs = getObserverService();
-    obs.addObserver(this, "quit-application-granted", false);
+  removeQuietly: function(p) {
+    try {
+      getObserverService().removeObserver(this, p);
+    } catch (ex) {}
   },
 
-  stopListening: function() {
-    let obs = getObserverService();
-    try {
-      obs.removeObserver(this, "quit-application-granted");
-    } catch (ex) {
-    }
-  },
-  
   register: function() {
     let obs = getObserverService();
     obs.addObserver(this, "weave:service:ready", false);
@@ -115,10 +109,9 @@ SyncOnExitObserver.prototype = {
   },
   
   unregister: function() {
-    let obs = getObserverService();
-    obs.removeObserver(this, "weave:service:ready");
-    obs.removeObserver(this, "weave:service:logout:finish");
-    this.stopListening();
+    this.removeQuietly("weave:service:ready");
+    this.removeQuietly("weave:service:logout:finish");
+    this.removeQuietly("quit-application-granted");
   }
 }
 
