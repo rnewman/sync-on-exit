@@ -84,16 +84,23 @@ SyncOnExitObserver.prototype = {
       case "weave:service:ready":
         let obs = getObserverService();
         obs.addObserver(this, "quit-application-granted", false);
+        getSyncService()._log.info("Sync ready: added quit observer for sync-on-exit.");
         break;
       case "weave:service:logout:finish":
         this.removeQuietly("quit-application-granted");
         break;
+
+      // We do our work on quit, rather than a more sophisticated scheme (such
+      // as canceling a quit, syncing, then quitting on completion) because...
+      // I don't see a way to quit!
+      // This does, however, mean we spin the event loop inside the quit
+      // observer. Not good. Use at your own risk.
       case "quit-application-granted":
         doSync();
         break;
     }
   },
-  
+
   removeQuietly: function(p) {
     try {
       getObserverService().removeObserver(this, p);
@@ -104,10 +111,21 @@ SyncOnExitObserver.prototype = {
     let obs = getObserverService();
     obs.addObserver(this, "weave:service:ready", false);
     obs.addObserver(this, "weave:service:logout:finish", false);
-    
+
     // Note that we don't actually listen if we're installed mid-run!
+    // Try and see.
+    let scope = {};
+    try {
+      Cu.import("resource://services-sync/service.js", scope);
+      if (scope.Weave.Status.ready) {
+        getSyncService()._log.info("Sync already up and running: added quit observer for sync-on-exit.");
+        obs.addObserver(this, "quit-application-granted", false);
+      }
+    } catch (ex) {
+      // Oh well.
+    }
   },
-  
+
   unregister: function() {
     this.removeQuietly("weave:service:ready");
     this.removeQuietly("weave:service:logout:finish");
