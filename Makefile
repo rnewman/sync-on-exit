@@ -44,7 +44,7 @@ objdir=$(TOPSRCDIR)/dist
 export stage_dir=$(objdir)/stage
 xpi_dir=$(objdir)/xpi
 
-xpi_name := synconexit.xpi
+xpi_name := sync-on-exit.xpi
 xpi_files := install.rdf bootstrap.js
 
 MKDIR = mkdir -p

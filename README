@@ -1,1 +1,22 @@
 This is the first draft of an add-on that syncs Firefox Sync on exit.
+
+Note that:
+
+* It's potentially dangerous. It does an entire sync inside the observer
+  handler for the quit notification, which does all kinds of nonsense with
+  runloops. Your browser might crash; I take no responsibility!
+
+* It's pretty hacky. I wrote most of the code on a plane.
+
+* It has only been tested in Firefox 4.0RC1 on Mac 10.6.6.
+
+* There's no icon.
+
+* I do not use it myself, so no promises about avoiding bitrot.
+
+
+On the plus side:
+
+* It's restartless!
+
+* It seems to work!
