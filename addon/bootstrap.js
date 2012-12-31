@@ -18,8 +18,11 @@ function getSyncService() {
   try {
     let bsp = Cu.import("resource://services-sync/service.js");
     if (bsp) {
-      getSyncService = function() bsp.Service;
-      return bsp.Service;
+      let service = bsp.Service;
+      getSyncService = function() {
+        return service;
+      };
+      return service;
     }
     throw "Could not import Sync code.";
   } catch (ex) {
@@ -84,8 +87,9 @@ SyncOnExitObserver.prototype = {
     let scope = {};
     try {
       Cu.import("resource://services-sync/service.js", scope);
-      if (scope.Weave.Status.ready) {
-        getSyncService()._log.info("Sync already up and running: added quit observer for sync-on-exit.");
+      let service = scope.Service;
+      if (service && service.status && service.status.ready) {
+        service._log.info("Sync already up and running: added quit observer for sync-on-exit.");
         obs.addObserver(this, "quit-application-granted", false);
       }
     } catch (ex) {
