@@ -101,11 +101,10 @@ SyncOnExitObserver.prototype = {
     this.removeQuietly("weave:service:ready");
     this.removeQuietly("weave:service:logout:finish");
     this.removeQuietly("quit-application-granted");
-  }
+  },
 }
 
-
-var exitObserver;
+let exitObserver;
 
 /**
  * Handle the add-on being activated on install/enable.
@@ -124,12 +123,15 @@ function shutdown(data, reason) {
 /**
  * Handle the add-on being installed.
  */
-function install({id}, reason) AddonManager.getAddonByID(id, function(addon) {
-  // Ensure enabled script: auto-enable on install.
-  addon.userDisabled = false;
-})
+function install({id}, reason) {
+  return AddonManager.getAddonByID(id, function(addon) {
+    // Ensure enabled script: auto-enable on install.
+    addon.userDisabled = false;
+  });
+}
 
 /**
  * Handle the add-on being uninstalled.
  */
-function uninstall(data, reason) {}
+function uninstall(data, reason) {
+}
